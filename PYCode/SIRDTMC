@@ -1,0 +1,42 @@
+#Stochastic SIR
+
+N = 100
+dt = 0.01
+beta = 1.0
+gamma = 0.25
+I0 = 1
+n_steps = 5000
+
+S, I, R = N - I0, I0, 0
+S_traj = np.zeros(n_steps, dtype=int)
+I_traj = np.zeros(n_steps, dtype=int)
+R_traj = np.zeros(n_steps, dtype=int)
+S_traj[0], I_traj[0], R_traj[0] = S, I, R
+
+for step in range(1, n_steps):
+    Pinf = beta * S * I / N * dt        
+    Prec = gamma * I * dt                
+    Pstay = 1 - Pinf - Prec              
+
+    u = np.random.rand()
+    if u < Pinf:
+        S -= 1
+        I += 1
+    elif u < Pinf + Prec:
+        I -= 1
+        R += 1
+
+    S_traj[step] = S
+    I_traj[step] = I
+    R_traj[step] = R
+
+times = np.arange(n_steps) * dt
+
+plt.figure(figsize=(10, 6))
+plt.plot(times, S_traj, label='S(t)')
+plt.plot(times, I_traj, label='I(t)')
+plt.plot(times, R_traj, label='R(t)')
+plt.xlabel('Time t')
+plt.ylabel('Population')
+plt.legend()
+plt.show()
